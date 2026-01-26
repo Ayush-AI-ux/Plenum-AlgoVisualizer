@@ -1,1 +1,1 @@
-# Plenum---AlgoVisualizer
+# Plenum-AlgoVisualizer
