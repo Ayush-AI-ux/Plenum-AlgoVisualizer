@@ -1,8 +1,19 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+
 function App() {
   return (
-    <div className="min-h-screen bg-black text-green-400 flex items-center justify-center text-3xl font-bold">
-      🚀 DSA 3D Visualizer is Live
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Default route */}
+        <Route path="/" element={<Navigate to="/signup" />} />
+
+        {/* Auth routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
