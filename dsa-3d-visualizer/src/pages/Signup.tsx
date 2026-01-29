@@ -242,7 +242,7 @@ export default function Signup() {
         style={{ 
           position: 'absolute', 
           top: 0, 
-          left: 0, 
+          left: -350, 
           width: '100%', 
           height: '100%',
           zIndex: 0
@@ -272,7 +272,7 @@ export default function Signup() {
         position: 'relative',
         marginLeft: 'auto',
         width: '100%',
-        maxWidth: '500px',
+        maxWidth: '630px',
         height: '100vh',
         display: 'flex',
         alignItems: 'center',
@@ -289,7 +289,7 @@ export default function Signup() {
             border: '1px solid rgba(6, 182, 212, 0.3)',
             borderRadius: '24px',
             boxShadow: '0 25px 50px -12px rgba(6, 182, 212, 0.25)',
-            padding: '48px',
+            padding: '4px',
             overflow: 'hidden'
           }}>
             
@@ -316,9 +316,9 @@ export default function Signup() {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                  lineHeight: '1.2'
+                  lineHeight: '1.0'
                 }}>
-                  Join the Future of AI
+                  Understand With Visualization
                 </h1>
                 <p style={{
                   color: 'rgba(103, 232, 249, 0.6)',
@@ -344,7 +344,7 @@ export default function Signup() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px'
+                  gap: '2px'
                 }}>
                   <svg style={{ width: '16px', height: '16px', flexShrink: 0 }} fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -377,8 +377,8 @@ export default function Signup() {
                     placeholder="Full Name"
                     required
                     style={{
-                      width: '100%',
-                      paddingLeft: '48px',
+                      width: '95%',
+                      paddingLeft: '40px',
                       paddingRight: '20px',
                       paddingTop: '14px',
                       paddingBottom: '14px',
@@ -426,9 +426,9 @@ export default function Signup() {
                     placeholder="Email address"
                     required
                     style={{
-                      width: '100%',
-                      paddingLeft: '48px',
-                      paddingRight: '20px',
+                      width: '95%',
+                      paddingLeft: '40px',
+                      paddingRight: '10px',
                       paddingTop: '14px',
                       paddingBottom: '14px',
                       backgroundColor: 'rgba(42, 42, 42, 0.6)',
@@ -475,7 +475,7 @@ export default function Signup() {
                     placeholder="Password"
                     required
                     style={{
-                      width: '100%',
+                      width: '95%',
                       paddingLeft: '48px',
                       paddingRight: '20px',
                       paddingTop: '14px',
@@ -524,7 +524,7 @@ export default function Signup() {
                     placeholder="Confirm Password"
                     required
                     style={{
-                      width: '100%',
+                      width: '95%',
                       paddingLeft: '48px',
                       paddingRight: '20px',
                       paddingTop: '14px',
@@ -557,8 +557,9 @@ export default function Signup() {
                   disabled={isLoading}
                   style={{
                     position: 'relative',
-                    width: '100%',
+                    width: '95%',
                     padding: '16px',
+                    left:'10px',
                     background: 'linear-gradient(to right, rgb(6, 182, 212), rgb(34, 211, 238))',
                     color: 'black',
                     fontWeight: 'bold',
@@ -632,7 +633,7 @@ export default function Signup() {
                 <p style={{
                   color: 'rgb(156, 163, 175)',
                   fontSize: '14px',
-                  margin: 0
+                  margin: 25
                 }}>
                   Already have an account?{" "}
                   <a
