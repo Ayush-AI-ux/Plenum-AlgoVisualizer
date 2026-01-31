@@ -1,21 +1,16 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { signup } from "../services/authService";
+import { requestPasswordReset } from "../services/authService";
 import * as THREE from "three";
 
-export default function Signup() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+export default function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [resetUrl, setResetUrl] = useState(""); // Store reset URL for development
+  const [isLoading, setIsLoading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -37,7 +32,7 @@ export default function Signup() {
     renderer.setClearColor(0x000000, 0);
     camera.position.z = 5;
 
-    // Create Matrix Rain Effect with Algorithm Symbols
+    // Create Matrix Rain Effect
     const matrixChars = "01アルゴリズムDSA{}[]<>/\\+-*=";
     const particles: THREE.Sprite[] = [];
     const particleCount = 100;
@@ -79,7 +74,7 @@ export default function Signup() {
       scene.add(sprite);
     }
 
-    // Create Pyramid Structure
+    // Create Pyramid
     const pyramidGeometry = new THREE.ConeGeometry(1.5, 3, 4);
     const pyramidEdges = new THREE.EdgesGeometry(pyramidGeometry);
     const pyramidLine = new THREE.LineSegments(
@@ -89,7 +84,7 @@ export default function Signup() {
     pyramidLine.position.set(0, 0, -2);
     scene.add(pyramidLine);
 
-    // Create Orbiting Rings
+    // Create Rings
     const ringGeometry = new THREE.TorusGeometry(2, 0.05, 16, 100);
     const ringMaterial = new THREE.MeshBasicMaterial({
       color: 0x00ffff,
@@ -103,74 +98,23 @@ export default function Signup() {
     ring2.rotation.y = Math.PI / 2;
     scene.add(ring1, ring2);
 
-    // Particle system for floating dots
-    const dotGeometry = new THREE.BufferGeometry();
-    const dotCount = 200;
-    const positions = new Float32Array(dotCount * 3);
-
-    for (let i = 0; i < dotCount * 3; i++) {
-      positions[i] = (Math.random() - 0.5) * 30;
-    }
-
-    dotGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    const dotMaterial = new THREE.PointsMaterial({
-      color: 0x00ffff,
-      size: 0.05,
-      transparent: true,
-      opacity: 0.6,
-    });
-    const dots = new THREE.Points(dotGeometry, dotMaterial);
-    scene.add(dots);
-
-    // Create Vertical Bars (right side effect)
-    const bars: THREE.Mesh[] = [];
-    const barHeights: number[] = [];
-    for (let i = 0; i < 8; i++) {
-      const height = Math.random() * 2 + 0.5;
-      barHeights.push(height);
-      const barGeometry = new THREE.BoxGeometry(0.15, height, 0.15);
-      const barMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00ffff,
-        transparent: true,
-        opacity: 0.7,
-      });
-      const bar = new THREE.Mesh(barGeometry, barMaterial);
-      bar.position.set(3 + i * 0.25, -1 + height / 2, -2);
-      bars.push(bar);
-      scene.add(bar);
-    }
-
-    // Animation Loop
+    // Animation
     let animationId: number;
     const animate = () => {
       animationId = requestAnimationFrame(animate);
 
       pyramidLine.rotation.y += 0.005;
       pyramidLine.rotation.x += 0.002;
-
       ring1.rotation.x += 0.01;
       ring2.rotation.z += 0.01;
 
       particles.forEach((particle, i) => {
         particle.position.y -= 0.02;
-        particle.rotation.z += 0.01;
-
         if (particle.position.y < -10) {
           particle.position.y = 10;
           particle.position.x = (Math.random() - 0.5) * 20;
         }
-
         particle.position.x += Math.sin(Date.now() * 0.001 + i) * 0.002;
-      });
-
-      dots.rotation.y += 0.0005;
-
-      // Animate bars
-      bars.forEach((bar, i) => {
-        const originalHeight = barHeights[i];
-        const newHeight = Math.abs(Math.sin(Date.now() * 0.001 + i * 0.5)) * 2 + 0.5;
-        bar.scale.y = newHeight / originalHeight;
-        bar.position.y = -1 + (newHeight * originalHeight) / 2;
       });
 
       renderer.render(scene, camera);
@@ -193,39 +137,30 @@ export default function Signup() {
     };
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (form.password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
-
+    setSuccess("");
+    setResetUrl("");
     setIsLoading(true);
 
     try {
-      const res = await signup(form);
-
-      if (res.token) {
-        localStorage.setItem("token", res.token);
-        alert("Signup successful 🎉 Redirecting to login...");
-        // Redirect to login page after successful signup
-        navigate('/login');
+      // Send both email and current password for verification
+      const res = await requestPasswordReset(email, currentPassword);
+      
+      if (res.success) {
+        setSuccess("Password reset link has been sent to your email!");
+        // Store reset URL if provided (for development)
+        if (res.resetUrl) {
+          setResetUrl(res.resetUrl);
+        }
+        setEmail("");
+        setCurrentPassword("");
       } else {
-        setError(res.message || "Signup failed");
+        setError(res.message || "Failed to send reset email. Please check your credentials.");
       }
     } catch (err) {
-      setError("Signup failed. Please try again.");
+      setError("An error occurred. Please verify your email and current password.");
     } finally {
       setIsLoading(false);
     }
@@ -242,13 +177,13 @@ export default function Signup() {
       backgroundColor: '#0a0a0a',
       display: 'flex'
     }}>
-      {/* Three.js Canvas Background - Left Side */}
+      {/* Three.js Canvas Background */}
       <canvas
         ref={canvasRef}
         style={{ 
           position: 'absolute', 
           top: 0, 
-          left: -350, 
+          left: -300, 
           width: '100%', 
           height: '100%',
           zIndex: 0
@@ -264,7 +199,6 @@ export default function Signup() {
         zIndex: 1
       }} />
 
-      {/* Vignette effect on the right to fade animation */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -273,21 +207,20 @@ export default function Signup() {
         zIndex: 2
       }} />
 
-      {/* Signup Form Container - Right Side */}
+      {/* Form Container */}
       <div style={{
         position: 'relative',
         marginLeft: 'auto',
         width: '100%',
-        maxWidth: '630px',
+        maxWidth: '800px',
         height: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '10px',
+        padding: '40px',
         zIndex: 10
       }}>
         <div style={{ width: '100%', maxWidth: '420px' }}>
-          {/* Card with glassmorphism effect */}
           <div style={{
             position: 'relative',
             backdropFilter: 'blur(16px)',
@@ -295,11 +228,10 @@ export default function Signup() {
             border: '1px solid rgba(6, 182, 212, 0.3)',
             borderRadius: '24px',
             boxShadow: '0 25px 50px -12px rgba(6, 182, 212, 0.25)',
-            padding: '20px',
+            padding: '48px',
             overflow: 'hidden'
           }}>
             
-            {/* Glow Border Effect */}
             <div style={{
               position: 'absolute',
               inset: '-1px',
@@ -310,10 +242,10 @@ export default function Signup() {
             }} />
             
             <div style={{ position: 'relative' }}>
-              {/* Header Section */}
+              {/* Header */}
               <div style={{ marginBottom: '40px' }}>
                 <h1 style={{
-                  fontSize: '42px',
+                  fontSize: '48px',
                   fontWeight: 'bold',
                   color: 'white',
                   letterSpacing: '-0.025em',
@@ -321,17 +253,16 @@ export default function Signup() {
                   background: 'linear-gradient(to right, white, rgb(165, 243, 252), white)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  lineHeight: '1.2'
+                  backgroundClip: 'text'
                 }}>
-                  Understand With Visualization
+                  Reset Password
                 </h1>
                 <p style={{
                   color: 'rgba(103, 232, 249, 0.6)',
                   fontSize: '14px',
                   letterSpacing: '0.025em'
                 }}>
-                  Create your account to get started
+                  Verify your identity to receive a reset link
                 </p>
               </div>
 
@@ -359,59 +290,76 @@ export default function Signup() {
                 </div>
               )}
 
-              {/* Signup Form */}
-              <form onSubmit={handleSubmit}>
-                {/* Full Name Input */}
-                <div style={{ position: 'relative', marginBottom: '16px' }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '16px',
-                    transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }}>
-                    <svg style={{ width: '20px', height: '20px', color: 'rgba(6, 182, 212, 0.5)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="Full Name"
-                    required
-                    style={{
-                      width: '100%',
-                      paddingLeft: '48px',
-                      paddingRight: '20px',
-                      paddingTop: '14px',
-                      paddingBottom: '14px',
-                      backgroundColor: 'rgba(42, 42, 42, 0.6)',
-                      border: '1px solid rgba(6, 182, 212, 0.3)',
-                      borderRadius: '12px',
-                      color: 'white',
-                      fontSize: '16px',
-                      outline: 'none',
-                      transition: 'all 0.3s',
-                      boxSizing: 'border-box'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(6, 182, 212, 0.6)';
-                      e.target.style.backgroundColor = 'rgba(42, 42, 42, 0.8)';
-                      e.target.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.15)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                      e.target.style.backgroundColor = 'rgba(42, 42, 42, 0.6)';
-                      e.target.style.boxShadow = 'none';
-                    }}
-                  />
+              {/* Success Message */}
+              {success && (
+                <div style={{
+                  marginBottom: '24px',
+                  padding: '16px',
+                  backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  borderRadius: '12px',
+                  color: 'rgb(167, 243, 208)',
+                  fontSize: '14px',
+                  textAlign: 'center',
+                  backdropFilter: 'blur(4px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}>
+                  <svg style={{ width: '16px', height: '16px', flexShrink: 0 }} fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  {success}
                 </div>
+              )}
 
+              {/* Development: Show Reset URL */}
+              {resetUrl && (
+                <div style={{
+                  marginBottom: '24px',
+                  padding: '16px',
+                  backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                  border: '1px solid rgba(6, 182, 212, 0.4)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(4px)'
+                }}>
+                  <p style={{
+                    color: 'rgb(103, 232, 249)',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    marginBottom: '8px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Development Mode - Reset Link:
+                  </p>
+                  <a
+                    href={resetUrl}
+                    style={{
+                      color: 'rgb(165, 243, 252)',
+                      fontSize: '13px',
+                      wordBreak: 'break-all',
+                      textDecoration: 'underline',
+                      display: 'block'
+                    }}
+                  >
+                    {resetUrl}
+                  </a>
+                  <p style={{
+                    color: 'rgba(103, 232, 249, 0.6)',
+                    fontSize: '11px',
+                    marginTop: '8px'
+                  }}>
+                    Click the link above or check your backend console
+                  </p>
+                </div>
+              )}
+
+              {/* Form */}
+              <form onSubmit={handleSubmit}>
                 {/* Email Input */}
-                <div style={{ position: 'relative', marginBottom: '16px' }}>
+                <div style={{ position: 'relative', marginBottom: '20px' }}>
                   <div style={{
                     position: 'absolute',
                     top: '50%',
@@ -427,16 +375,16 @@ export default function Signup() {
                   <input
                     type="email"
                     name="email"
-                    value={form.email}
-                    onChange={handleChange}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email address"
                     required
                     style={{
                       width: '100%',
                       paddingLeft: '48px',
                       paddingRight: '20px',
-                      paddingTop: '14px',
-                      paddingBottom: '14px',
+                      paddingTop: '16px',
+                      paddingBottom: '16px',
                       backgroundColor: 'rgba(42, 42, 42, 0.6)',
                       border: '1px solid rgba(6, 182, 212, 0.3)',
                       borderRadius: '12px',
@@ -459,8 +407,8 @@ export default function Signup() {
                   />
                 </div>
 
-                {/* Password Input */}
-                <div style={{ position: 'relative', marginBottom: '16px' }}>
+                {/* Current Password Input */}
+                <div style={{ position: 'relative', marginBottom: '24px' }}>
                   <div style={{
                     position: 'absolute',
                     top: '50%',
@@ -475,17 +423,17 @@ export default function Signup() {
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Password"
+                    name="currentPassword"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Current password"
                     required
                     style={{
                       width: '100%',
                       paddingLeft: '48px',
                       paddingRight: '48px',
-                      paddingTop: '14px',
-                      paddingBottom: '14px',
+                      paddingTop: '16px',
+                      paddingBottom: '16px',
                       backgroundColor: 'rgba(42, 42, 42, 0.6)',
                       border: '1px solid rgba(6, 182, 212, 0.3)',
                       borderRadius: '12px',
@@ -544,92 +492,30 @@ export default function Signup() {
                   </button>
                 </div>
 
-                {/* Confirm Password Input */}
-                <div style={{ position: 'relative', marginBottom: '24px' }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '16px',
-                    transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                    zIndex: 1
+                {/* Security Notice */}
+                <div style={{
+                  marginBottom: '24px',
+                  padding: '12px 16px',
+                  backgroundColor: 'rgba(6, 182, 212, 0.05)',
+                  border: '1px solid rgba(6, 182, 212, 0.2)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start'
+                }}>
+                  <svg style={{ width: '18px', height: '18px', color: 'rgb(6, 182, 212)', flexShrink: 0, marginTop: '2px' }} fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  <p style={{
+                    color: 'rgba(103, 232, 249, 0.8)',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                    margin: 0
                   }}>
-                    <svg style={{ width: '20px', height: '20px', color: 'rgba(6, 182, 212, 0.5)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    value={form.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="Confirm Password"
-                    required
-                    style={{
-                      width: '100%',
-                      paddingLeft: '48px',
-                      paddingRight: '48px',
-                      paddingTop: '14px',
-                      paddingBottom: '14px',
-                      backgroundColor: 'rgba(42, 42, 42, 0.6)',
-                      border: '1px solid rgba(6, 182, 212, 0.3)',
-                      borderRadius: '12px',
-                      color: 'white',
-                      fontSize: '16px',
-                      outline: 'none',
-                      transition: 'all 0.3s',
-                      boxSizing: 'border-box'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(6, 182, 212, 0.6)';
-                      e.target.style.backgroundColor = 'rgba(42, 42, 42, 0.8)';
-                      e.target.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.15)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                      e.target.style.backgroundColor = 'rgba(42, 42, 42, 0.6)';
-                      e.target.style.boxShadow = 'none';
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      right: '16px',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'rgba(6, 182, 212, 0.5)',
-                      transition: 'color 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = 'rgba(6, 182, 212, 0.8)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgba(6, 182, 212, 0.5)';
-                    }}
-                  >
-                    {showConfirmPassword ? (
-                      <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                      </svg>
-                    ) : (
-                      <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
-                  </button>
+                    For your security, we need to verify your current password before sending a reset link.
+                  </p>
                 </div>
 
-                {/* Sign Up Button */}
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -661,151 +547,42 @@ export default function Signup() {
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 >
-                  {isLoading ? (
-                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                      <svg style={{ animation: 'spin 1s linear infinite', height: '20px', width: '20px' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Signing up...
-                    </span>
-                  ) : (
-                    "Sign up"
-                  )}
+                  {isLoading ? "Verifying..." : "Send Reset Link"}
                 </button>
               </form>
 
-              {/* Divider */}
-              <div style={{ 
-                position: 'relative', 
-                margin: '32px 0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  <div style={{
-                    width: '100%',
-                    borderTop: '1px solid rgba(6, 182, 212, 0.2)'
-                  }} />
-                </div>
-                <span style={{
-                  position: 'relative',
-                  padding: '0 16px',
-                  backgroundColor: 'rgba(26, 26, 26, 0.9)',
-                  color: 'rgb(107, 114, 128)',
-                  fontSize: '14px'
-                }}>
-                  Already a member?
-                </span>
-              </div>
-
-              {/* Login Link */}
-              <div style={{ textAlign: 'center' }}>
-                <p style={{
-                  color: 'rgb(156, 163, 175)',
-                  fontSize: '14px',
-                  margin: 0
-                }}>
-                  Already have an account?{" "}
-                  <a
-                    href="/login"
-                    style={{
-                      color: 'rgb(6, 182, 212)',
-                      fontWeight: '600',
-                      textDecoration: 'none',
-                      transition: 'color 0.3s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = 'rgb(103, 232, 249)';
-                      e.currentTarget.style.textDecoration = 'underline';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgb(6, 182, 212)';
-                      e.currentTarget.style.textDecoration = 'none';
-                    }}
-                  >
-                    Log In
-                  </a>
-                </p>
+              {/* Back to Login */}
+              <div style={{ textAlign: 'center', marginTop: '32px' }}>
+                <a
+                  href="/login"
+                  style={{
+                    color: 'rgb(6, 182, 212)',
+                    fontSize: '14px',
+                    textDecoration: 'none',
+                    transition: 'color 0.3s',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'rgb(103, 232, 249)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'rgb(6, 182, 212)';
+                  }}
+                >
+                  <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back to Login
+                </a>
               </div>
             </div>
-          </div>
-
-          {/* Bottom Tagline */}
-          <div style={{
-            textAlign: 'center',
-            marginTop: '24px',
-            color: 'rgb(75, 85, 99)',
-            fontSize: '12px',
-            letterSpacing: '0.05em'
-          }}>
-            Secured by advanced encryption
           </div>
         </div>
       </div>
 
-      {/* Corner Decorations */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '160px',
-        height: '160px',
-        borderTop: '2px solid rgba(6, 182, 212, 0.2)',
-        borderLeft: '2px solid rgba(6, 182, 212, 0.2)',
-        borderTopLeftRadius: '24px',
-        pointerEvents: 'none',
-        zIndex: 3
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        width: '160px',
-        height: '160px',
-        borderBottom: '2px solid rgba(6, 182, 212, 0.2)',
-        borderRight: '2px solid rgba(6, 182, 212, 0.2)',
-        borderBottomRightRadius: '24px',
-        pointerEvents: 'none',
-        zIndex: 3
-      }} />
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        width: '80px',
-        height: '80px',
-        borderTop: '1px solid rgba(6, 182, 212, 0.1)',
-        borderRight: '1px solid rgba(6, 182, 212, 0.1)',
-        borderTopRightRadius: '16px',
-        pointerEvents: 'none',
-        zIndex: 3
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        width: '80px',
-        height: '80px',
-        borderBottom: '1px solid rgba(6, 182, 212, 0.1)',
-        borderLeft: '1px solid rgba(6, 182, 212, 0.1)',
-        borderBottomLeftRadius: '16px',
-        pointerEvents: 'none',
-        zIndex: 3
-      }} />
-
-      {/* Animation Keyframes */}
       <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
         input::placeholder {
           color: rgb(107, 114, 128);
         }
