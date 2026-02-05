@@ -4,6 +4,8 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  googleId?: string;       
+  avatar?: string;          
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt: Date;
@@ -24,6 +26,15 @@ const UserSchema: Schema = new Schema({
     type: String,
     required: [true, "Please provide a password"],
     minlength: 8,
+  },
+  // ⭐ NEW: Google OAuth fields
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // Allows null values while maintaining uniqueness
+  },
+  avatar: {
+    type: String,
   },
   // Password reset fields
   resetPasswordToken: {

@@ -31,8 +31,21 @@ export const login = async (data: {
   return res.json();
 };
 
+// Google OAuth Login
+export const googleLogin = async (credential: string) => {
+  const res = await fetch(`${API_URL}/google-login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ credential }),
+  });
+
+  return res.json();
+};
+
 // Request password reset (send email with reset link)
-// NOW REQUIRES CURRENT PASSWORD FOR VERIFICATION
+// REQUIRES CURRENT PASSWORD FOR VERIFICATION
 export const requestPasswordReset = async (
   email: string,
   currentPassword: string
@@ -49,7 +62,7 @@ export const requestPasswordReset = async (
       },
       body: JSON.stringify({ 
         email,
-        currentPassword // Added current password for verification
+        currentPassword // Current password for verification
       }),
     });
 

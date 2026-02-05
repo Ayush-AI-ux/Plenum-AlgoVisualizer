@@ -4,6 +4,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { sendPasswordResetEmail } from "../services/emailService";
+import { OAuth2Client } from "google-auth-library";
+
+// Initialize Google OAuth client
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -84,12 +88,84 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// Forgot Password - Send reset token (NOW WITH CURRENT PASSWORD VERIFICATION)
+// ⭐ NEW: Google OAuth Login
+export const googleLogin = async (req: Request, res: Response) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ message: "Google credential is required" });
+    }
+
+    // Verify Google token
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(400).json({ message: "Invalid Google token" });
+    }
+
+    const { email, name, picture } = payload;
+
+    // Check if user exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user if doesn't exist
+      // Generate random password for Google users
+      const randomPassword = crypto.randomBytes(32).toString("hex");
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      user = await User.create({
+        name: name || email.split("@")[0],
+        email,
+        password: hashedPassword,
+        googleId: payload.sub,
+        avatar: picture,
+      });
+
+      console.log(`✅ New user created via Google: ${email}`);
+    } else {
+      // Update Google ID if not set
+      if (!user.googleId) {
+        user.googleId = payload.sub;
+        await user.save();
+      }
+      console.log(`✅ Existing user logged in via Google: ${email}`);
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      message: "Google login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({ message: "Google login failed", error });
+  }
+};
+
+// Forgot Password - Send reset token (WITH CURRENT PASSWORD VERIFICATION)
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email, currentPassword } = req.body;
 
-    // Validate input - NOW REQUIRES BOTH EMAIL AND CURRENT PASSWORD
+    // Validate input - REQUIRES BOTH EMAIL AND CURRENT PASSWORD
     if (!email || !currentPassword) {
       return res.status(400).json({
         success: false,
@@ -107,7 +183,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       });
     }
 
-    // ⭐ VERIFY CURRENT PASSWORD - THIS IS THE KEY ADDITION
+    // ⭐ VERIFY CURRENT PASSWORD
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
     
     if (!isPasswordValid) {
@@ -153,7 +229,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
       console.log("\n");
       
       // In development, still return success with URL
-      // In production, you might want to return an error
       if (process.env.NODE_ENV === "development") {
         res.json({
           success: true,
