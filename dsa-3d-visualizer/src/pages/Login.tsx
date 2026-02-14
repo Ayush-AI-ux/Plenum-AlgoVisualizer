@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { login, googleLogin } from "../services/authService";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import * as THREE from "three";
 
-// Your Google Client ID (get from Google Cloud Console)
+// Your Google Client ID
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
 
 function LoginForm() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +35,7 @@ function LoginForm() {
     renderer.setClearColor(0x000000, 0);
     camera.position.z = 5;
 
-    // Create Matrix Rain Effect with Algorithm Symbols
+    // Create Matrix Rain Effect
     const matrixChars = "01アルゴリズムDSA{}[]<>/\\+-*=";
     const particles: THREE.Sprite[] = [];
     const particleCount = 100;
@@ -75,7 +77,7 @@ function LoginForm() {
       scene.add(sprite);
     }
 
-    // Create Glowing Pyramid/Algorithm Structure
+    // Create Pyramid
     const pyramidGeometry = new THREE.ConeGeometry(1.5, 3, 4);
     const pyramidEdges = new THREE.EdgesGeometry(pyramidGeometry);
     const pyramidLine = new THREE.LineSegments(
@@ -85,7 +87,7 @@ function LoginForm() {
     pyramidLine.position.set(0, 0, -2);
     scene.add(pyramidLine);
 
-    // Create Orbiting Rings
+    // Create Rings
     const ringGeometry = new THREE.TorusGeometry(2, 0.05, 16, 100);
     const ringMaterial = new THREE.MeshBasicMaterial({
       color: 0x00ffff,
@@ -99,7 +101,7 @@ function LoginForm() {
     ring2.rotation.y = Math.PI / 2;
     scene.add(ring1, ring2);
 
-    // Particle system for floating dots
+    // Particle dots
     const dotGeometry = new THREE.BufferGeometry();
     const dotCount = 200;
     const positions = new Float32Array(dotCount * 3);
@@ -118,31 +120,27 @@ function LoginForm() {
     const dots = new THREE.Points(dotGeometry, dotMaterial);
     scene.add(dots);
 
-    // Animation Loop
+    // Animation
     let animationId: number;
     const animate = () => {
       animationId = requestAnimationFrame(animate);
 
       pyramidLine.rotation.y += 0.005;
       pyramidLine.rotation.x += 0.002;
-
       ring1.rotation.x += 0.01;
       ring2.rotation.z += 0.01;
 
       particles.forEach((particle, i) => {
         particle.position.y -= 0.02;
         particle.rotation.z += 0.01;
-
         if (particle.position.y < -10) {
           particle.position.y = 10;
           particle.position.x = (Math.random() - 0.5) * 20;
         }
-
         particle.position.x += Math.sin(Date.now() * 0.001 + i) * 0.002;
       });
 
       dots.rotation.y += 0.0005;
-
       renderer.render(scene, camera);
     };
 
@@ -177,7 +175,8 @@ function LoginForm() {
       
       if (res.token) {
         localStorage.setItem("token", res.token);
-        alert("Login successful 🚀");
+        // ⭐ Navigate to home instead of alert
+        navigate("/home");
       } else {
         setError(res.message || "Login failed");
       }
@@ -197,8 +196,8 @@ function LoginForm() {
       
       if (res.token) {
         localStorage.setItem("token", res.token);
-        alert("Google login successful 🚀");
-        // Redirect or update UI
+        // ⭐ Navigate to home instead of alert
+        navigate("/home");
       } else {
         setError(res.message || "Google login failed");
       }
@@ -224,7 +223,7 @@ function LoginForm() {
       backgroundColor: '#0a0a0a',
       display: 'flex'
     }}>
-      {/* Three.js Canvas Background */}
+      {/* Canvas */}
       <canvas
         ref={canvasRef}
         style={{ 
@@ -237,7 +236,7 @@ function LoginForm() {
         }}
       />
 
-      {/* Gradient Overlays */}
+      {/* Overlays */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -254,7 +253,7 @@ function LoginForm() {
         zIndex: 2
       }} />
 
-      {/* Login Form Container */}
+      {/* Form Container */}
       <div style={{
         position: 'relative',
         marginLeft: 'auto',
@@ -313,8 +312,8 @@ function LoginForm() {
                 </p>
               </div>
 
-              {/* Google Sign In Button */}
-              <div style={{ marginBottom: '24px' }}>
+              {/* Google Button */}
+              <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
                   onError={handleGoogleError}
@@ -322,11 +321,10 @@ function LoginForm() {
                   size="large"
                   text="continue_with"
                   shape="rectangular"
-                  width={330}
                 />
               </div>
 
-              {/* Divider - OR */}
+              {/* Divider */}
               <div style={{ 
                 position: 'relative', 
                 margin: '32px 0',
@@ -356,7 +354,7 @@ function LoginForm() {
                 </span>
               </div>
 
-              {/* Error Message */}
+              {/* Error */}
               {error && (
                 <div style={{
                   marginBottom: '24px',
@@ -366,36 +364,16 @@ function LoginForm() {
                   borderRadius: '12px',
                   color: 'rgb(252, 165, 165)',
                   fontSize: '14px',
-                  textAlign: 'center',
-                  backdropFilter: 'blur(4px)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
+                  textAlign: 'center'
                 }}>
-                  <svg style={{ width: '16px', height: '16px', flexShrink: 0 }} fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
                   {error}
                 </div>
               )}
 
-              {/* Regular Login Form */}
+              {/* Form */}
               <form onSubmit={handleSubmit}>
-                {/* Email Input */}
+                {/* Email */}
                 <div style={{ position: 'relative', marginBottom: '20px' }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '16px',
-                    transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }}>
-                    <svg style={{ width: '20px', height: '20px', color: 'rgba(6, 182, 212, 0.5)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                    </svg>
-                  </div>
                   <input
                     type="email"
                     name="email"
@@ -405,46 +383,31 @@ function LoginForm() {
                     required
                     style={{
                       width: '100%',
-                      paddingLeft: '48px',
-                      paddingRight: '20px',
-                      paddingTop: '16px',
-                      paddingBottom: '16px',
+                      padding: '16px 20px 16px 48px',
                       backgroundColor: 'rgba(42, 42, 42, 0.6)',
                       border: '1px solid rgba(6, 182, 212, 0.3)',
                       borderRadius: '12px',
                       color: 'white',
                       fontSize: '16px',
                       outline: 'none',
-                      transition: 'all 0.3s',
                       boxSizing: 'border-box'
                     }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(6, 182, 212, 0.6)';
-                      e.target.style.backgroundColor = 'rgba(42, 42, 42, 0.8)';
-                      e.target.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.15)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                      e.target.style.backgroundColor = 'rgba(42, 42, 42, 0.6)';
-                      e.target.style.boxShadow = 'none';
-                    }}
                   />
+                  <svg style={{ 
+                    position: 'absolute', 
+                    left: '16px', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)',
+                    width: '20px',
+                    height: '20px',
+                    color: 'rgba(6, 182, 212, 0.5)'
+                  }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                  </svg>
                 </div>
 
-                {/* Password Input */}
+                {/* Password */}
                 <div style={{ position: 'relative', marginBottom: '20px' }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '16px',
-                    transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }}>
-                    <svg style={{ width: '20px', height: '20px', color: 'rgba(6, 182, 212, 0.5)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
@@ -454,90 +417,53 @@ function LoginForm() {
                     required
                     style={{
                       width: '100%',
-                      paddingLeft: '48px',
-                      paddingRight: '48px',
-                      paddingTop: '16px',
-                      paddingBottom: '16px',
+                      padding: '16px 48px 16px 48px',
                       backgroundColor: 'rgba(42, 42, 42, 0.6)',
                       border: '1px solid rgba(6, 182, 212, 0.3)',
                       borderRadius: '12px',
                       color: 'white',
                       fontSize: '16px',
                       outline: 'none',
-                      transition: 'all 0.3s',
                       boxSizing: 'border-box'
                     }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(6, 182, 212, 0.6)';
-                      e.target.style.backgroundColor = 'rgba(42, 42, 42, 0.8)';
-                      e.target.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.15)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                      e.target.style.backgroundColor = 'rgba(42, 42, 42, 0.6)';
-                      e.target.style.boxShadow = 'none';
-                    }}
                   />
+                  <svg style={{ 
+                    position: 'absolute', 
+                    left: '16px', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)',
+                    width: '20px',
+                    height: '20px',
+                    color: 'rgba(6, 182, 212, 0.5)'
+                  }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     style={{
                       position: 'absolute',
-                      top: '50%',
                       right: '16px',
+                      top: '50%',
                       transform: 'translateY(-50%)',
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'rgba(6, 182, 212, 0.5)',
-                      transition: 'color 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = 'rgba(6, 182, 212, 0.8)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgba(6, 182, 212, 0.5)';
+                      color: 'rgba(6, 182, 212, 0.5)'
                     }}
                   >
-                    {showPassword ? (
-                      <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                      </svg>
-                    ) : (
-                      <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
+                    {showPassword ? "👁️" : "👁️‍🗨️"}
                   </button>
                 </div>
 
                 {/* Forgot Password */}
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'flex-end', 
-                  paddingTop: '4px',
-                  marginBottom: '24px'
-                }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
                   <a
                     href="/forgot-password"
                     style={{
                       fontSize: '14px',
                       color: 'rgba(6, 182, 212, 0.8)',
-                      textDecoration: 'none',
-                      transition: 'color 0.3s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = 'rgb(103, 232, 249)';
-                      e.currentTarget.style.textDecoration = 'underline';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgba(6, 182, 212, 0.8)';
-                      e.currentTarget.style.textDecoration = 'none';
+                      textDecoration: 'none'
                     }}
                   >
                     Forgot password?
@@ -549,7 +475,6 @@ function LoginForm() {
                   type="submit"
                   disabled={isLoading}
                   style={{
-                    position: 'relative',
                     width: '100%',
                     padding: '16px',
                     background: 'linear-gradient(to right, rgb(6, 182, 212), rgb(34, 211, 238))',
@@ -558,116 +483,37 @@ function LoginForm() {
                     borderRadius: '12px',
                     border: 'none',
                     cursor: isLoading ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.3s',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
                     fontSize: '16px',
-                    opacity: isLoading ? 0.5 : 1,
-                    overflow: 'hidden'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isLoading) {
-                      e.currentTarget.style.transform = 'scale(1.02)';
-                      e.currentTarget.style.boxShadow = '0 0 30px rgba(34, 211, 238, 0.4)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = 'none';
+                    opacity: isLoading ? 0.5 : 1
                   }}
                 >
                   {isLoading ? "Logging in..." : "Log in"}
                 </button>
               </form>
 
-              {/* Sign Up Link */}
+              {/* Signup Link */}
               <div style={{ textAlign: 'center', marginTop: '32px' }}>
-                <p style={{
-                  color: 'rgb(156, 163, 175)',
-                  fontSize: '14px',
-                  margin: 0
-                }}>
+                <p style={{ color: 'rgb(156, 163, 175)', fontSize: '14px', margin: 0 }}>
                   Don't have an account?{" "}
-                  <a
-                    href="/signup"
-                    style={{
-                      color: 'rgb(6, 182, 212)',
-                      fontWeight: '600',
-                      textDecoration: 'none',
-                      transition: 'color 0.3s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = 'rgb(103, 232, 249)';
-                      e.currentTarget.style.textDecoration = 'underline';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgb(6, 182, 212)';
-                      e.currentTarget.style.textDecoration = 'none';
-                    }}
-                  >
+                  <a href="/signup" style={{ color: 'rgb(6, 182, 212)', fontWeight: '600', textDecoration: 'none' }}>
                     Create Account
                   </a>
                 </p>
               </div>
             </div>
           </div>
-
-          {/* Bottom Tagline */}
-          <div style={{
-            textAlign: 'center',
-            marginTop: '24px',
-            color: 'rgb(75, 85, 99)',
-            fontSize: '12px',
-            letterSpacing: '0.05em'
-          }}>
-            Secured by advanced encryption
-          </div>
         </div>
       </div>
 
-      {/* Corner Decorations */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '160px',
-        height: '160px',
-        borderTop: '2px solid rgba(6, 182, 212, 0.2)',
-        borderLeft: '2px solid rgba(6, 182, 212, 0.2)',
-        borderTopLeftRadius: '24px',
-        pointerEvents: 'none',
-        zIndex: 3
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        width: '160px',
-        height: '160px',
-        borderBottom: '2px solid rgba(6, 182, 212, 0.2)',
-        borderRight: '2px solid rgba(6, 182, 212, 0.2)',
-        borderBottomRightRadius: '24px',
-        pointerEvents: 'none',
-        zIndex: 3
-      }} />
-
       <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        input::placeholder {
-          color: rgb(107, 114, 128);
-        }
-        * {
-          box-sizing: border-box;
-        }
+        input::placeholder { color: rgb(107, 114, 128); }
+        * { box-sizing: border-box; }
       `}</style>
     </div>
   );
 }
 
-// Wrap with Google OAuth Provider
 export default function Login() {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
