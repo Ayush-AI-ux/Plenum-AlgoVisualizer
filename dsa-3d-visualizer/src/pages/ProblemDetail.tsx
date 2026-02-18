@@ -23,7 +23,26 @@ interface Problem {
     algorithmName: string;
     description: string;
   };
+  solutions?: {
+    [language: string]: string;
+  };
 }
+
+const LANGUAGE_COLORS: Record<string, string> = {
+  "C++": "#00599C",
+  "Java": "#f89820",
+  "Python": "#3776AB",
+  "JavaScript": "#F7DF1E",
+  "Go": "#00ADD8",
+};
+
+const LANGUAGE_ICONS: Record<string, string> = {
+  "C++": "⚡",
+  "Java": "☕",
+  "Python": "🐍",
+  "JavaScript": "📜",
+  "Go": "🔷",
+};
 
 export default function ProblemDetail() {
   const navigate = useNavigate();
@@ -32,6 +51,9 @@ export default function ProblemDetail() {
   const [problem, setProblem] = useState<Problem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showSolutions, setShowSolutions] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("Python");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const token = getToken();
@@ -190,8 +212,13 @@ export default function ProblemDetail() {
   };
 
   const handleStartVisualization = () => {
-    // TODO: Navigate to visualization player
     navigate(`/visualize/${id}`);
+  };
+
+  const copyToClipboard = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
   };
 
   if (isLoading) {
@@ -250,6 +277,8 @@ export default function ProblemDetail() {
       </div>
     );
   }
+
+  const languages = problem.solutions ? Object.keys(problem.solutions) : [];
 
   return (
     <div style={{
@@ -545,6 +574,187 @@ export default function ProblemDetail() {
               </div>
             </div>
 
+            {/* Solution Section */}
+            {languages.length > 0 && (
+              <div style={{ marginBottom: '24px' }}>
+                <button
+                  onClick={() => setShowSolutions(!showSolutions)}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                    border: '2px solid rgba(168, 85, 247, 0.3)',
+                    borderRadius: '12px',
+                    color: '#c084fc',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    transition: 'all 0.3s',
+                    marginBottom: showSolutions ? '16px' : '0'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(168, 85, 247, 0.2)';
+                    e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.5)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(168, 85, 247, 0.1)';
+                    e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.3)';
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>💻</span>
+                    View Solutions in {languages.length} Languages
+                  </span>
+                  <span style={{
+                    fontSize: '20px',
+                    transform: showSolutions ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.3s'
+                  }}>
+                    ▼
+                  </span>
+                </button>
+
+                {showSolutions && (
+                  <div style={{
+                    backgroundColor: 'rgba(20, 20, 20, 0.6)',
+                    border: '1px solid rgba(168, 85, 247, 0.2)',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    animation: 'slideDown 0.3s ease-out'
+                  }}>
+                    {/* Language Tabs */}
+                    <div style={{
+                      display: 'flex',
+                      gap: '8px',
+                      marginBottom: '20px',
+                      flexWrap: 'wrap',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                      paddingBottom: '12px'
+                    }}>
+                      {languages.map((lang) => (
+                        <button
+                          key={lang}
+                          onClick={() => {
+                            setSelectedLanguage(lang);
+                            setCopied(false); // Reset copied state when switching languages
+                          }}
+                          style={{
+                            padding: '10px 16px',
+                            backgroundColor: selectedLanguage === lang 
+                              ? `${LANGUAGE_COLORS[lang]}30` 
+                              : 'rgba(255, 255, 255, 0.05)',
+                            border: selectedLanguage === lang 
+                              ? `2px solid ${LANGUAGE_COLORS[lang]}` 
+                              : '2px solid rgba(255, 255, 255, 0.1)',
+                            borderRadius: '8px',
+                            color: selectedLanguage === lang 
+                              ? LANGUAGE_COLORS[lang] 
+                              : 'rgba(255, 255, 255, 0.6)',
+                            cursor: 'pointer',
+                            fontWeight: selectedLanguage === lang ? '600' : '500',
+                            fontSize: '14px',
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (selectedLanguage !== lang) {
+                              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (selectedLanguage !== lang) {
+                              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
+                            }
+                          }}
+                        >
+                          <span>{LANGUAGE_ICONS[lang]}</span>
+                          {lang}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Code Display */}
+                    {problem.solutions && problem.solutions[selectedLanguage] && (
+                      <div style={{ position: 'relative' }}>
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '12px'
+                        }}>
+                          <span style={{
+                            color: LANGUAGE_COLORS[selectedLanguage],
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <span style={{ fontSize: '18px' }}>
+                              {LANGUAGE_ICONS[selectedLanguage]}
+                            </span>
+                            {selectedLanguage} Solution
+                          </span>
+                          <button
+                            onClick={() => copyToClipboard(problem.solutions![selectedLanguage])}
+                            style={{
+                              padding: '8px 12px',
+                              backgroundColor: copied ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                              border: copied ? '1px solid rgba(34, 197, 94, 0.5)' : '1px solid rgba(255, 255, 255, 0.2)',
+                              borderRadius: '6px',
+                              color: copied ? '#22c55e' : 'rgba(255, 255, 255, 0.7)',
+                              cursor: 'pointer',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              transition: 'all 0.2s',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!copied) {
+                                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                                e.currentTarget.style.color = 'white';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!copied) {
+                                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                              }
+                            }}
+                          >
+                            {copied ? '✓ Copied!' : '📋 Copy Code'}
+                          </button>
+                        </div>
+                        <pre style={{
+                          backgroundColor: '#1a1a1a',
+                          border: `1px solid ${LANGUAGE_COLORS[selectedLanguage]}30`,
+                          borderRadius: '8px',
+                          padding: '20px',
+                          overflowX: 'auto',
+                          fontSize: '14px',
+                          lineHeight: '1.6',
+                          fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace",
+                          margin: 0,
+                          color: '#e0e0e0'
+                        }}>
+                          <code>{problem.solutions[selectedLanguage]}</code>
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Start Button */}
             <button
               onClick={handleStartVisualization}
@@ -580,6 +790,20 @@ export default function ProblemDetail() {
           </div>
         </div>
       </div>
+
+      {/* Add animation keyframes */}
+      <style>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

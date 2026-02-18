@@ -68,6 +68,9 @@ export interface IProblem extends Document {
   algorithmsRequired: string[];
   algorithmTutorial: IAlgorithmTutorial;
   problemSolution: IProblemSolution;
+  solutions?: {
+    [language: string]: string;
+  };
   complexity: {
     time: string;
     space: string;
@@ -223,6 +226,11 @@ const ProblemSchema: Schema = new Schema(
     problemSolution: {
       type: ProblemSolutionSchema,
       required: true,
+    },
+    solutions: {
+      type: Map,
+      of: String,
+      default: {},
     },
     complexity: {
       time: {

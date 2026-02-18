@@ -2,7 +2,7 @@ import Problem from "../models/Problem";
 
 // ========================================
 // SEED DATA: TWO SUM PROBLEM
-// Complete with Algorithm Tutorial + Problem Solution
+// Complete with Algorithm Tutorial + Problem Solution + Code Solutions
 // Total: 5 tutorial frames + 10 solution frames = 15 frames
 // ========================================
 
@@ -36,6 +36,158 @@ You can return the answer in any order.`,
   ],
 
   algorithmsRequired: ["hash-map"],
+
+  // ========================================
+  // CODE SOLUTIONS IN MULTIPLE LANGUAGES
+  // ========================================
+  solutions: {
+    "Python": `class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        """
+        Find two numbers that add up to target using hash map.
+        
+        Time Complexity: O(n)
+        Space Complexity: O(n)
+        """
+        # Dictionary to store number and its index
+        seen = {}
+        
+        # Iterate through the array
+        for i, num in enumerate(nums):
+            # Calculate the complement
+            complement = target - num
+            
+            # Check if complement exists in our hash map
+            if complement in seen:
+                return [seen[complement], i]
+            
+            # Store current number and its index
+            seen[num] = i
+        
+        # No solution found (should never reach here per problem constraints)
+        return []`,
+
+    "C++": `class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        /*
+         * Find two numbers that add up to target using hash map.
+         * 
+         * Time Complexity: O(n)
+         * Space Complexity: O(n)
+         */
+        
+        // Hash map to store number and its index
+        unordered_map<int, int> seen;
+        
+        // Iterate through the array
+        for (int i = 0; i < nums.size(); i++) {
+            int complement = target - nums[i];
+            
+            // Check if complement exists in hash map
+            if (seen.find(complement) != seen.end()) {
+                return {seen[complement], i};
+            }
+            
+            // Store current number and its index
+            seen[nums[i]] = i;
+        }
+        
+        // No solution found (should never reach here)
+        return {};
+    }
+};`,
+
+    "Java": `class Solution {
+    /**
+     * Find two numbers that add up to target using hash map.
+     * 
+     * Time Complexity: O(n)
+     * Space Complexity: O(n)
+     */
+    public int[] twoSum(int[] nums, int target) {
+        // Hash map to store number and its index
+        Map<Integer, Integer> seen = new HashMap<>();
+        
+        // Iterate through the array
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            
+            // Check if complement exists in hash map
+            if (seen.containsKey(complement)) {
+                return new int[] { seen.get(complement), i };
+            }
+            
+            // Store current number and its index
+            seen.put(nums[i], i);
+        }
+        
+        // No solution found (should never reach here)
+        return new int[] {};
+    }
+}`,
+
+    "JavaScript": `/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+    /*
+     * Find two numbers that add up to target using hash map.
+     * 
+     * Time Complexity: O(n)
+     * Space Complexity: O(n)
+     */
+    
+    // Map to store number and its index
+    const seen = new Map();
+    
+    // Iterate through the array
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        
+        // Check if complement exists in hash map
+        if (seen.has(complement)) {
+            return [seen.get(complement), i];
+        }
+        
+        // Store current number and its index
+        seen.set(nums[i], i);
+    }
+    
+    // No solution found (should never reach here)
+    return [];
+};`,
+
+    "Go": `func twoSum(nums []int, target int) []int {
+    /*
+     * Find two numbers that add up to target using hash map.
+     * 
+     * Time Complexity: O(n)
+     * Space Complexity: O(n)
+     */
+    
+    // Map to store number and its index
+    seen := make(map[int]int)
+    
+    // Iterate through the array
+    for i, num := range nums {
+        complement := target - num
+        
+        // Check if complement exists in hash map
+        if j, found := seen[complement]; found {
+            return []int{j, i}
+        }
+        
+        // Store current number and its index
+        seen[num] = i
+    }
+    
+    // No solution found (should never reach here)
+    return nil
+}`,
+  },
 
   // ========================================
   // PART 1: ALGORITHM TUTORIAL (Hash Map)
@@ -128,7 +280,7 @@ You can return the answer in any order.`,
               text: "Key → Value",
               position: [0, 4, 0],
               color: "#60a5fa",
-              size: 0.4,
+              size: 1.0,
             },
           ],
           particles: {
@@ -848,6 +1000,7 @@ export const seedTwoSumProblem = async () => {
     console.log(`   - ${problem.algorithmTutorial.frames.length} tutorial frames`);
     console.log(`   - ${problem.problemSolution.frames.length} solution frames`);
     console.log(`   - Total: ${problem.algorithmTutorial.frames.length + problem.problemSolution.frames.length} frames`);
+    console.log(`   - Solutions in ${Object.keys(problem.solutions || {}).length} languages`);
     
     return problem;
   } catch (error) {
