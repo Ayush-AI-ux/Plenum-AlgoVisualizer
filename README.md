@@ -326,10 +326,6 @@ We welcome contributions! Here's how you can help:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-### **Adding New Problems**
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guide on adding new problems with 3D visualizations.
-
----
 
 ## 🗺️ Roadmap
 
@@ -380,26 +376,25 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 📞 Contact & Support
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/yourusername/dsa-3d-visualizer/issues)
-- **Email**: your.email@example.com
-- **Twitter**: [@yourhandle](https://twitter.com/yourhandle)
-- **LinkedIn**: [Your Profile](https://linkedin.com/in/yourprofile)
+- **GitHub Issues**: [Report bugs or request features](https://github.com/Ayush-AI-ux/dsa-3d-visualizer/issues)
+- **Email**: ayushmittal8955@gmail.com
+- **LinkedIn**: [Your Profile](https://www.linkedin.com/in/ayush-mittal-b25361289/)
 
 ---
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/dsa-3d-visualizer&type=Date)](https://star-history.com/#yourusername/dsa-3d-visualizer&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Ayush-AI-ux/dsa-3d-visualizer&type=Date)](https://star-history.com/#yourusername/dsa-3d-visualizer&Date)
 
 ---
 
 ## 📊 Project Stats
 
-![GitHub repo size](https://img.shields.io/github/repo-size/yourusername/dsa-3d-visualizer)
-![GitHub stars](https://img.shields.io/github/stars/yourusername/dsa-3d-visualizer?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/dsa-3d-visualizer?style=social)
-![GitHub issues](https://img.shields.io/github/issues/yourusername/dsa-3d-visualizer)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/dsa-3d-visualizer)
+![GitHub repo size](https://img.shields.io/github/repo-size/Ayush-AI-ux/dsa-3d-visualizer)
+![GitHub stars](https://img.shields.io/github/stars/Ayush-AI-ux/dsa-3d-visualizer?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Ayush-AI-ux/dsa-3d-visualizer?style=social)
+![GitHub issues](https://img.shields.io/github/issues/Ayush-AI-ux/dsa-3d-visualizer)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/Ayush-AI-ux/dsa-3d-visualizer)
 
 ---
 
