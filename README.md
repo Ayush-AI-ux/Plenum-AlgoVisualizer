@@ -79,7 +79,7 @@ An immersive learning platform that brings DSA concepts to life with stunning 3D
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/dsa-3d-visualizer.git
+   git clone https://github.com/Ayush-AI-ux/dsa-3d-visualizer.git
    cd dsa-3d-visualizer
    ```
 
