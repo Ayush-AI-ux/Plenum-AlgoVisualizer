@@ -382,22 +382,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=Ayush-AI-ux/dsa-3d-visualizer&type=Date)](https://star-history.com/#Ayush-AI-ux/dsa-3d-visualizer&Date)
-
----
-
-## 📊 Project Stats
-
-![GitHub repo size](https://img.shields.io/github/repo-size/Ayush-AI-ux/dsa-3d-visualizer)
-![GitHub stars](https://img.shields.io/github/stars/Ayush-AI-ux/dsa-3d-visualizer?style=social)
-![GitHub forks](https://img.shields.io/github/forks/Ayush-AI-ux/dsa-3d-visualizer?style=social)
-![GitHub issues](https://img.shields.io/github/issues/Ayush-AI-ux/dsa-3d-visualizer)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/Ayush-AI-ux/dsa-3d-visualizer)
-
----
-
 <div align="center">
 
 ### 💙 **Made with passion for teaching DSA**
