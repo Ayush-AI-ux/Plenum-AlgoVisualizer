@@ -384,7 +384,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Ayush-AI-ux/dsa-3d-visualizer&type=Date)](https://star-history.com/#yourusername/dsa-3d-visualizer&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Ayush-AI-ux/dsa-3d-visualizer&type=Date)](https://star-history.com/#Ayush-AI-ux/dsa-3d-visualizer&Date)
 
 ---
 
