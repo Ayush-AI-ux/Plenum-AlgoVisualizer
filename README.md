@@ -16,6 +16,9 @@ An immersive learning platform that brings DSA concepts to life with stunning 3D
 ## 📸 Screenshots
 
 <div align="center">
+  <img src="screenshots/login.png" alt="Home Page" width="800"/>
+  <p><i>Creative Authorization Page with Google Login</i></p>
+  
   <img src="screenshots/home.png" alt="Home Page" width="800"/>
   <p><i>Beautiful landing page with particle animations</i></p>
   
