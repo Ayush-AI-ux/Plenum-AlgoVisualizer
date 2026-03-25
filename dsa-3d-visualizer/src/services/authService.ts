@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "https://plenum-algovisualizer.onrender.com/";
 
 export const signup = async (data: {
   name: string;
