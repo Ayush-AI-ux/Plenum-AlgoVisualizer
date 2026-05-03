@@ -343,24 +343,22 @@ We welcome contributions! Here's how you can help:
 - [x] Tutorial and solution modes
 
 ### **Version 1.1** 🚧
-- [ ] User progress tracking
-- [ ] Problem bookmarking
-- [ ] User dashboard
-- [ ] 5 more problems
+- [x] User dashboard
+- [x] 5 more problems
 
 ### **Version 2.0** 📋
-- [ ] Tree visualizations
-- [ ] Graph visualizations
+- [x] Tree visualizations
+- [x] Graph visualizations
 - [ ] Practice mode
 - [ ] Code editor integration
-- [ ] 25+ total problems
+- [x] 25+ total problems
 
 ### **Version 3.0** 🌟
 - [ ] Mobile app (React Native)
 - [ ] Discussion forums
 - [ ] Leaderboards
 - [ ] Premium features
-- [ ] 50+ problems
+- [x] 50+ problems
 
 ---
 
