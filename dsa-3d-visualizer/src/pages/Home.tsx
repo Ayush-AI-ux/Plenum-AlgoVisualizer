@@ -965,7 +965,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout, getToken } from "../services/authService";
+// import * as THREE from "three";
+
 import * as THREE from "three";
+import API_BASE_URL from "../config/api";
 
 interface UserData {
   name: string;
@@ -993,7 +996,7 @@ export default function Home() {
     const fetchUserData = async () => {
       try {
         setIsLoadingUser(true);
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,

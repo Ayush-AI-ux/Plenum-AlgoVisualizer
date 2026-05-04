@@ -2091,6 +2091,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../services/authService";
 import * as THREE from "three";
+import API_BASE_URL from "../config/api";
 
 interface Problem {
   _id: string;
@@ -2263,7 +2264,7 @@ export default function ProblemList() {
     try {
       setIsLoading(true);
       const query = selectedDifficulty !== "all" ? `?difficulty=${selectedDifficulty}` : "";
-      const response = await fetch(`http://localhost:5000/api/problems${query}`);
+      const response = await fetch(`${API_BASE_URL}/api/problems${query}`);
       const data = await response.json();
       if (data.success) {
         setProblems(data.data);
@@ -2318,7 +2319,7 @@ export default function ProblemList() {
     setAiStep("generating");
     setAiError("");
     try {
-      const response = await fetch("http://localhost:5000/api/ai/generate", {
+      const response = await fetch(`${API_BASE_URL}/api/ai/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(aiForm),

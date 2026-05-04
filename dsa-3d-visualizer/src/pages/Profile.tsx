@@ -706,6 +706,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getToken, logout } from "../services/authService";
 import * as THREE from "three";
+import API_BASE_URL from "../config/api";
 
 interface UserData {
   name: string;
@@ -833,7 +834,7 @@ export default function Profile() {
     try {
       setIsLoading(true);
       const token = getToken();
-      const response = await fetch("http://localhost:5000/api/auth/me", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -870,7 +871,7 @@ export default function Profile() {
 
     try {
       const token = getToken();
-      const response = await fetch("http://localhost:5000/api/auth/update-profile", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/update-profile`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,

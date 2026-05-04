@@ -1762,6 +1762,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getToken } from "../services/authService";
 import * as THREE from "three";
 import Scene3DRenderer from "../components/Scene3DRenderer";
+import API_BASE_URL from "../config/api";
 
 interface Frame {
   frameNumber: number;
@@ -1813,7 +1814,7 @@ export default function VisualizationPlayer() {
     const fetchProblem = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`http://localhost:5000/api/problems/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/problems/${id}`);
         const data = await response.json();
 
         if (data.success) {
