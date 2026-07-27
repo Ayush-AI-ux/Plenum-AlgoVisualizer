@@ -177,7 +177,7 @@ export default function ProblemDetail() {
     const fetchProblem = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`http://localhost:5000/api/problems/${id}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/problems/${id}`);
         const data = await response.json();
 
         if (data.success) {
